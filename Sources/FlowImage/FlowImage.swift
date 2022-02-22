@@ -9,20 +9,24 @@ public protocol FlowImage {
     /// You can call this method before using the image to prepare for display if needed.
     ///
     /// Calling this method gives the underlying implementation a chance to
-    /// download any data from the internet or render it out in the memory.
+    /// download any data from the internet or render it out in the memory, for example.
     func prepareForDisplay() async throws -> FlowImage
 
     /// After calling prepareForDisplay you can get the UIImage using this method.
-    /// - Note: Please use getUIImageFromCache() for automatic caching.
+    /// - Note: Use getUIImageFromCache() for automatic caching.
     func getUIImage() async throws -> UIImage
 }
 
 extension FlowImage {
-    func toEquatable() -> AnyFlowImage {
+    func eraseToAnyFlowImage() -> AnyFlowImage {
         return AnyFlowImage(self)
     }
 
-//    func getUIImageFromCache() async throws -> UIImage {
-//        try await PictureCache.instance.get(self)
-//    }
+    func getUIImageFromCache() async throws -> UIImage {
+        try await self.getUIImageFromCache(FlowCache.instance)
+    }
+
+    func getUIImageFromCache(_ cache: FlowCache) async throws -> UIImage {
+        try await cache.get(self)
+    }
 }
