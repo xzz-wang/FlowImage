@@ -26,7 +26,7 @@ extension FlowImage {
     }
 
     func getUIImageFromCache() async throws -> UIImage {
-        try await self.getUIImageFromCache(FlowCache.instance)
+        try await self.getUIImageFromCache(FlowCache.shared)
     }
 
     func getUIImageFromCache(_ cache: FlowCache) async throws -> UIImage {
