@@ -8,7 +8,7 @@
 import UIKit
 
 // Type Erasing reference: [https://khawerkhaliq.com/blog/swift-protocols-equatable-part-two/]
-struct AnyFlowImage: FlowImage, Equatable {
+struct AnyFlowImage: FlowImage, Equatable, Hashable, Identifiable {
     private let picture: FlowImage
 
     var id: ID {
@@ -25,6 +25,10 @@ struct AnyFlowImage: FlowImage, Equatable {
 
     func getUIImage() async throws -> UIImage {
         try await picture.getUIImage()
+    }
+
+    func hash(into hasher: inout Hasher) {
+        picture.hash(into: &hasher)
     }
 
     static func == (lhs: AnyFlowImage, rhs: AnyFlowImage) -> Bool {

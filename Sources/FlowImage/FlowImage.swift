@@ -15,6 +15,9 @@ public protocol FlowImage {
     /// After calling prepareForDisplay you can get the UIImage using this method.
     /// - Note: Use getUIImageFromCache() for automatic caching.
     func getUIImage() async throws -> UIImage
+
+    /// To support hashing of AnyFlowImage
+    func hash(into hasher: inout Hasher)
 }
 
 extension FlowImage {

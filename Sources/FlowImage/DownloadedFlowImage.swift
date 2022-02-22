@@ -49,4 +49,9 @@ class DownloadedFlowImage: FlowImage {
         }
         return uiImage
     }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(uiImage)
+        hasher.combine(rendered)
+    }
 }
