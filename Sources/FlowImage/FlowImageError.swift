@@ -7,6 +7,7 @@
 
 import Foundation
 
-enum FlowImageError: Error {
+public enum FlowImageError: Error {
+    case uiImageDecodeFailed
     case failed
 }

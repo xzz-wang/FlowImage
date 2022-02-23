@@ -11,7 +11,7 @@ import UIKit
 ///
 /// Used in Picture's getUIImageFromCache() to produce your image.
 ///
-actor FlowCache {
+public actor FlowCache {
     static let shared = FlowCache()
 
     /// Maybe in the future we can add an expire time to this.
@@ -20,6 +20,8 @@ actor FlowCache {
     }
 
     private var tasks: [FlowImage.ID: Task<CacheEntry, Error>] = [:]
+
+    public init() {}
 
     /// Cache the image or replace the cached image.
     func cache(_ picture: FlowImage) {
@@ -36,10 +38,14 @@ actor FlowCache {
         tasks[picture.id] = newTask
     }
 
-    func get(_ picture: FlowImage, forceReCache: Bool = false) async throws -> UIImage {
+    public func get(_ picture: FlowImage, forceReCache: Bool = false) async throws -> UIImage {
         if forceReCache || tasks[picture.id] == nil {
             cache(picture)
         }
         return try await tasks[picture.id]!.value.image.getUIImage()
+    }
+
+    public func reset() {
+        tasks = [:]
     }
 }

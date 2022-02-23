@@ -6,21 +6,21 @@
 
 import UIKit
 
-class DownloadedFlowImage: FlowImage {
-    var id: ID {
+public class DownloadedFlowImage: FlowImage {
+    public var id: ID {
         "DownloadedPicture: \(rendered) - \(uiImage.hashValue)"
     }
 
     internal var uiImage: UIImage
     internal var rendered: Bool
 
-    init(uiImage: UIImage, rendered: Bool = false) {
+    public init(uiImage: UIImage, rendered: Bool = false) {
         self.uiImage = uiImage
         self.rendered = rendered
     }
 
     /// Returns nil if we can not create UIImage from Data
-    init?(data: Data) {
+    public init?(data: Data) {
         guard let uiImage = UIImage(data: data) else {
             return nil
         }
@@ -29,7 +29,7 @@ class DownloadedFlowImage: FlowImage {
         self.rendered = false
     }
 
-    func prepareForDisplay() async throws -> FlowImage {
+    public func prepareForDisplay() async throws -> FlowImage {
         if rendered {
             return self
         }
@@ -37,11 +37,11 @@ class DownloadedFlowImage: FlowImage {
         if let newImg = await uiImage.byPreparingForDisplay() {
             return DownloadedFlowImage(uiImage: newImg, rendered: true)
         } else {
-            throw FlowImageError.failed
+            throw FlowImageError.uiImageDecodeFailed
         }
     }
 
-    func getUIImage() async throws -> UIImage {
+    public func getUIImage() async throws -> UIImage {
         if !rendered {
             let newPic = try await prepareForDisplay()
             uiImage = try await newPic.getUIImage()
@@ -50,7 +50,7 @@ class DownloadedFlowImage: FlowImage {
         return uiImage
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(uiImage)
         hasher.combine(rendered)
     }
