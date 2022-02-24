@@ -20,16 +20,16 @@ public protocol FlowImage {
     func hash(into hasher: inout Hasher)
 }
 
-extension FlowImage {
+public extension FlowImage {
     func eraseToAnyFlowImage() -> AnyFlowImage {
         return AnyFlowImage(self)
     }
 
-    func getUIImageFromCache() async throws -> UIImage {
-        try await self.getUIImageFromCache(FlowCache.shared)
+    func getUIImageFromCache(forceRecache: Bool = false) async throws -> UIImage {
+        try await self.getUIImageFromCache(FlowCache.shared, forceRecache: forceRecache)
     }
 
-    func getUIImageFromCache(_ cache: FlowCache) async throws -> UIImage {
-        try await cache.get(self)
+    func getUIImageFromCache(_ cache: FlowCache, forceRecache: Bool = false) async throws -> UIImage {
+        try await cache.get(self, forceReCache: forceRecache)
     }
 }

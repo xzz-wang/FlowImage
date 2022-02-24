@@ -24,7 +24,7 @@ class FlowCacheTest: XCTestCase {
         private let failGet: Bool
 
 
-        init(_ uiimage: UIImage, id: ID?, failPrepare: Bool = false, failGet: Bool = false) {
+        init(_ uiimage: UIImage, id: ID? = nil, failPrepare: Bool = false, failGet: Bool = false) {
             self.img = uiimage
             self.id = id ?? "TestImage - \(img.hashValue)"
             self.failPrepare = failPrepare
@@ -65,9 +65,9 @@ class FlowCacheTest: XCTestCase {
         let flow1 = TestFlowImage(img1, id: "test_one_pic")
         let flow2 = TestFlowImage(img2, id: "test_one_pic")
 
-        _ = try await cache.get(flow1)
+        _ = try await flow1.getUIImageFromCache(cache)
         await cache.reset()
-        let resultImg = try await cache.get(flow2)
+        let resultImg = try await flow2.getUIImageFromCache(cache)
 
         XCTAssert(resultImg == img2, "Reset working incorrectly")
     }
@@ -77,8 +77,8 @@ class FlowCacheTest: XCTestCase {
         let flow1 = TestFlowImage(img1, id: "test_get")
         let flow2 = TestFlowImage(img2, id: "test_get")
 
-        _ = try await cache.get(flow1)
-        let resultImg = try await cache.get(flow2)
+        _ = try await flow1.getUIImageFromCache(cache)
+        let resultImg = try await flow2.getUIImageFromCache(cache)
 
         // Should have gotten img1 from cache instead of img2.
         XCTAssert(resultImg == img1, "Not getting the image from cache!")
@@ -90,8 +90,8 @@ class FlowCacheTest: XCTestCase {
         let flow2 = TestFlowImage(img2, id: "test_get")
         let flow3 = TestFlowImage(img1, id: "test_get_notThisOne")
 
-        _ = try await cache.get(flow1)
-        _ = try await cache.get(flow3)
+        _ = try await flow1.getUIImageFromCache(cache)
+        _ = try await flow3.getUIImageFromCache(cache)
         let resultImg = try await cache.get(flow2)
 
         // Should have gotten img1 from cache instead of img2.
@@ -103,17 +103,17 @@ class FlowCacheTest: XCTestCase {
         let flow1 = TestFlowImage(img1, id: "test_recache")
         let flow2 = TestFlowImage(img2, id: "test_recache")
 
-        _ = try await cache.get(flow1)
-        let resultImg = try await cache.get(flow2, forceReCache: true)
+        _ = try await flow1.getUIImageFromCache(cache)
+        let resultImg = try await flow2.getUIImageFromCache(cache, forceRecache: true)
 
         XCTAssert(resultImg == img2, "Not force recaching!")
     }
 
     func testFailedPrepare() async {
         await cache.reset()
-        let flow1 = TestFlowImage(img1, id: "test_fail", failPrepare: true)
+        let flow1 = TestFlowImage(img1, failPrepare: true)
         do {
-            _ = try await cache.get(flow1)
+            _ = try await flow1.getUIImageFromCache(cache)
             XCTFail()
         } catch {
             XCTAssert(error as! FlowImageError == FlowImageError.failed)
@@ -122,9 +122,9 @@ class FlowCacheTest: XCTestCase {
 
     func testFailedGet() async {
         await cache.reset()
-        let flow1 = TestFlowImage(img1, id: "test_fail", failGet: true)
+        let flow1 = TestFlowImage(img1, failGet: true)
         do {
-            _ = try await cache.get(flow1)
+            _ = try await flow1.getUIImageFromCache(cache)
             XCTFail()
         } catch {
             XCTAssert(error as! FlowImageError == FlowImageError.failed)
