@@ -12,7 +12,7 @@ import UIKit
 /// Used in Picture's getUIImageFromCache() to produce your image.
 ///
 public actor FlowCache {
-    static let shared = FlowCache()
+    public static let shared = FlowCache()
 
     /// Maybe in the future we can add an expire time to this.
     private struct CacheEntry {
