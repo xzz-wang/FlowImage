@@ -48,18 +48,18 @@ struct FlowImageView<Content: View>: View {
     }
 }
 
-// struct ProfilePicture_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let craig = DownloadedFlowImage(uiImage: UIImage(systemName: "person.circle")!)
-//        let cache = FlowCache.shared
-//        FlowImageView(image: craig, cache: cache) { img, state in
-//            if state == .loading {
-//                ProgressView()
-//                    .progressViewStyle(.circular)
-//            } else if let img = img {
-//                Image(uiImage: img)
-//            }
-//        }
-//            .previewLayout(.fixed(width: 120, height: 120))
-//    }
-// }
+ struct ProfilePicture_Previews: PreviewProvider {
+    static var previews: some View {
+        let craig = DownloadedFlowImage(uiImage: UIImage(systemName: "person.circle")!)
+        let cache = FlowCache.shared
+        FlowImageView(image: craig, cache: cache) { img, state in
+            if state == .loading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+            } else if let img = img {
+                Image(uiImage: img)
+            }
+        }
+            .previewLayout(.fixed(width: 120, height: 120))
+    }
+ }

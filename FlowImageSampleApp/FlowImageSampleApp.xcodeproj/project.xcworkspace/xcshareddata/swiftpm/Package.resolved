@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "FlowImage",
+        "repositoryURL": "https://github.com/xzz-wang/FlowImage",
+        "state": {
+          "branch": "main",
+          "revision": "f05643b5d20f46461194fde44a583690de6842cd",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
