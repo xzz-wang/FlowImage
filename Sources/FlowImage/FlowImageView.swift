@@ -9,15 +9,21 @@ import SwiftUI
 
 public struct FlowImageView<Content: View>: View {
     /// The three states of this view.
-    enum ViewState {
+    public enum ViewState {
         case displaying
         case error
         case loading
     }
 
+    public init(image: FlowImage?, cache: FlowCache? = nil, contentBuilder: @escaping (UIImage?, ViewState) -> Content) {
+        self.image = image
+        self.cache = cache ?? FlowCache.shared
+        self.contentBuilder = contentBuilder
+    }
+
     // MARK: - Inputs
     let image: FlowImage?
-    @State var cache = FlowCache.shared
+    let cache: FlowCache
     @ViewBuilder let contentBuilder: (UIImage?, ViewState) -> Content
 
     // MARK: - States

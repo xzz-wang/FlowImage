@@ -12,7 +12,7 @@ public class URLFlowImage: FlowImage {
 
     internal let url: URL
 
-    init(_ url: URL) {
+    public init(_ url: URL) {
         self.url = url
         self.id = "URLFlowImage - " + url.absoluteString
     }
