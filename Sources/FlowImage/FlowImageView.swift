@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FlowImageView<Content: View>: View {
+public struct FlowImageView<Content: View>: View {
     /// The three states of this view.
     enum ViewState {
         case displaying
@@ -25,7 +25,7 @@ struct FlowImageView<Content: View>: View {
     @State private var viewState: ViewState = .loading
 
     // MARK: - View Body
-    var body: some View {
+    public var body: some View {
         contentBuilder(uiimage, self.viewState)
             .onChange(of: image?.eraseToAnyFlowImage()) { newImage in
                 fetchImage(newImage, cache: cache)
@@ -47,19 +47,3 @@ struct FlowImageView<Content: View>: View {
         }
     }
 }
-
- struct ProfilePicture_Previews: PreviewProvider {
-    static var previews: some View {
-        let craig = DownloadedFlowImage(uiImage: UIImage(systemName: "person.circle")!)
-        let cache = FlowCache.shared
-        FlowImageView(image: craig, cache: cache) { img, state in
-            if state == .loading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-            } else if let img = img {
-                Image(uiImage: img)
-            }
-        }
-            .previewLayout(.fixed(width: 120, height: 120))
-    }
- }

@@ -10,7 +10,7 @@ import FlowImage
 
 struct ContentView: View {
     var body: some View {
-        FlowImag
+        Text("Hello, world!")
     }
 }
 
