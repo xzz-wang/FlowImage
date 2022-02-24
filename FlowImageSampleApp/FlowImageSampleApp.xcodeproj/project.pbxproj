@@ -11,7 +11,7 @@
 		C01B100D27C7635B00C39818 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01B100C27C7635B00C39818 /* ContentView.swift */; };
 		C01B100F27C7635C00C39818 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C01B100E27C7635C00C39818 /* Assets.xcassets */; };
 		C01B101227C7635C00C39818 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C01B101127C7635C00C39818 /* Preview Assets.xcassets */; };
-		C01B101A27C764DE00C39818 /* FlowImage in Frameworks */ = {isa = PBXBuildFile; productRef = C01B101927C764DE00C39818 /* FlowImage */; };
+		C03C46B827C76B1900BC978B /* FlowImage in Frameworks */ = {isa = PBXBuildFile; productRef = C03C46B727C76B1900BC978B /* FlowImage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +21,7 @@
 		C01B100E27C7635C00C39818 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C01B101127C7635C00C39818 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C01B101B27C765FE00C39818 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C03C46B427C76AC600BC978B /* FlowImage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlowImage; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,7 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C01B101A27C764DE00C39818 /* FlowImage in Frameworks */,
+				C03C46B827C76B1900BC978B /* FlowImage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +41,7 @@
 			children = (
 				C01B100927C7635B00C39818 /* FlowImageSampleApp */,
 				C01B100827C7635B00C39818 /* Products */,
+				C03C46B327C76AC600BC978B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,6 +73,14 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		C03C46B327C76AC600BC978B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C03C46B427C76AC600BC978B /* FlowImage */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -88,7 +98,7 @@
 			);
 			name = FlowImageSampleApp;
 			packageProductDependencies = (
-				C01B101927C764DE00C39818 /* FlowImage */,
+				C03C46B727C76B1900BC978B /* FlowImage */,
 			);
 			productName = FlowImageSampleApp;
 			productReference = C01B100727C7635B00C39818 /* FlowImageSampleApp.app */;
@@ -119,7 +129,7 @@
 			);
 			mainGroup = C01B0FFE27C7635A00C39818;
 			packageReferences = (
-				C01B101827C764DE00C39818 /* XCRemoteSwiftPackageReference "FlowImage" */,
+				C03C46B627C76B1900BC978B /* XCRemoteSwiftPackageReference "FlowImage" */,
 			);
 			productRefGroup = C01B100827C7635B00C39818 /* Products */;
 			projectDirPath = "";
@@ -353,7 +363,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C01B101827C764DE00C39818 /* XCRemoteSwiftPackageReference "FlowImage" */ = {
+		C03C46B627C76B1900BC978B /* XCRemoteSwiftPackageReference "FlowImage" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/xzz-wang/FlowImage";
 			requirement = {
@@ -364,9 +374,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C01B101927C764DE00C39818 /* FlowImage */ = {
+		C03C46B727C76B1900BC978B /* FlowImage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C01B101827C764DE00C39818 /* XCRemoteSwiftPackageReference "FlowImage" */;
+			package = C03C46B627C76B1900BC978B /* XCRemoteSwiftPackageReference "FlowImage" */;
 			productName = FlowImage;
 		};
 /* End XCSwiftPackageProductDependency section */
