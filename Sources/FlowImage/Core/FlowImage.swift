@@ -21,6 +21,7 @@ public protocol FlowImage {
 }
 
 public extension FlowImage {
+    /// Get a type-erasing instance that conforms to Equatable, Hashable, and Identifiable.
     func eraseToAnyFlowImage() -> AnyFlowImage {
         return AnyFlowImage(self)
     }

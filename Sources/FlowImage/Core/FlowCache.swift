@@ -45,7 +45,7 @@ public actor FlowCache {
         return try await tasks[picture.id]!.value.image.getUIImage()
     }
 
-    public func reset() {
+    public func clear() {
         tasks = [:]
     }
 }

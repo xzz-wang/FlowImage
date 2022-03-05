@@ -53,7 +53,7 @@ class FlowCacheTest: XCTestCase {
     func testResetEmpty() throws {
         let exp = expectation(description: "reset() doesn't crash")
         Task {
-            await cache.reset()
+            await cache.clear()
             exp.fulfill()
         }
 
@@ -61,19 +61,19 @@ class FlowCacheTest: XCTestCase {
     }
 
     func testResetOnePic() async throws {
-        await cache.reset()
+        await cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_one_pic")
         let flow2 = TestFlowImage(img2, id: "test_one_pic")
 
         _ = try await flow1.getUIImageFromCache(cache)
-        await cache.reset()
+        await cache.clear()
         let resultImg = try await flow2.getUIImageFromCache(cache)
 
         XCTAssert(resultImg == img2, "Reset working incorrectly")
     }
 
     func testGet() async throws {
-        await cache.reset()
+        await cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_get")
         let flow2 = TestFlowImage(img2, id: "test_get")
 
@@ -85,7 +85,7 @@ class FlowCacheTest: XCTestCase {
     }
 
     func testGet2() async throws {
-        await cache.reset()
+        await cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_get")
         let flow2 = TestFlowImage(img2, id: "test_get")
         let flow3 = TestFlowImage(img1, id: "test_get_notThisOne")
@@ -99,7 +99,7 @@ class FlowCacheTest: XCTestCase {
     }
 
     func testRecache() async throws {
-        await cache.reset()
+        await cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_recache")
         let flow2 = TestFlowImage(img2, id: "test_recache")
 
@@ -110,7 +110,7 @@ class FlowCacheTest: XCTestCase {
     }
 
     func testFailedPrepare() async {
-        await cache.reset()
+        await cache.clear()
         let flow1 = TestFlowImage(img1, failPrepare: true)
         do {
             _ = try await flow1.getUIImageFromCache(cache)
@@ -121,7 +121,7 @@ class FlowCacheTest: XCTestCase {
     }
 
     func testFailedGet() async {
-        await cache.reset()
+        await cache.clear()
         let flow1 = TestFlowImage(img1, failGet: true)
         do {
             _ = try await flow1.getUIImageFromCache(cache)

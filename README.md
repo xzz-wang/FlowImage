@@ -7,7 +7,9 @@ To add FlowImage to your app, see: [Doc: Adding Package Dependencies to Your App
 # Usage
 ## FlowImage
 
-FlowImage is a protocol for you to implement. A `FlowImage` should store all the necessary information to produce an image, and also defines how to produce it.
+FlowImage is a protocol for you to implement. Once implemented, it will come with 
+a lot of great utilities. A `FlowImage` should store all the necessary information 
+to produce an image, and also defines how to produce it.
 It only requires 1 property and 3 methods:
 ```Swift
 protocol FlowImage {
