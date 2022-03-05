@@ -20,6 +20,7 @@ public class FlowCache {
     /// Maybe in the future we can add an expire time to this.
     private struct CacheEntry {
         let image: Task<FlowImage, Error>
+        let didChangePublisher: PassthroughSubject<Void, Never>
     }
 
     private var imageCache: [FlowImage.ID: CacheEntry] = [:]
@@ -45,6 +46,7 @@ public class FlowCache {
 
     /// Cache the image or replace the cached image.
     func cache(_ picture: FlowImage) {
+        // Create a new task to cache this new image
         let newImgTask = Task { () -> FlowImage in
             do {
                 return try await picture.prepareForDisplay()
@@ -53,8 +55,19 @@ public class FlowCache {
                 throw error
             }
         }
-        imageCache[picture.id]?.image.cancel()
-        imageCache[picture.id] = CacheEntry(image: newImgTask)
+
+        let entry = imageCache[picture.id]
+
+        // Cancel the image task if there's already an entry
+        entry?.image.cancel()
+
+        // Create new publisher if needed, then build new entry
+        let publisher = entry?.didChangePublisher ?? PassthroughSubject<Void, Never>()
+        let newEntry = CacheEntry(image: newImgTask, didChangePublisher: publisher)
+
+        // Replace existing entry, then notify changes if needed.
+        imageCache[picture.id] = newEntry
+        entry?.didChangePublisher.send() // Notify changes if there
     }
 
     // MARK: - Private functions
