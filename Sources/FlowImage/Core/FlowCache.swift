@@ -26,7 +26,6 @@ public class FlowCache {
     private var memoryWarningSubscription: Cancellable?
 
     public init() {
-        // Register publisher for handling low memory
         subscribeToMemoryWarning()
     }
 
@@ -38,6 +37,9 @@ public class FlowCache {
     }
 
     public func clear() {
+        for (_, task) in tasks {
+            task.cancel()
+        }
         tasks = [:]
     }
 
@@ -57,12 +59,15 @@ public class FlowCache {
     }
 
     // MARK: - Private functions
+
+    /// Subscribe to publisher for handling low memory
+    /// Note: Currently, the cache will clear itself when the memory is low.
     private func subscribeToMemoryWarning() {
         let warningNotification = UIApplication.didReceiveMemoryWarningNotification
         let warningPublisher = NotificationCenter.default.publisher(for: warningNotification)
         memoryWarningSubscription = warningPublisher
             .sink { notification in
-                print("FlowCache: did receive memory warning! Handler not implemented.")
+                self.clear()
             }
     }
 }
