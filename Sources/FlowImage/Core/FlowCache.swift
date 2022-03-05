@@ -12,7 +12,8 @@ import UIKit
 ///
 /// An actor that produces thread-safe caching of FlowImages.
 ///
-public actor FlowCache {
+@MainActor
+public class FlowCache {
     /// A singleton instance that is commonly used as default when a FlowCache is needed.
     public static let shared = FlowCache()
 
@@ -22,8 +23,12 @@ public actor FlowCache {
     }
 
     private var tasks: [FlowImage.ID: Task<CacheEntry, Error>] = [:]
+    private var memoryWarningSubscription: Cancellable?
 
-    public init() {}
+    public init() {
+        // Register publisher for handling low memory
+        subscribeToMemoryWarning()
+    }
 
     public func get(_ picture: FlowImage, forceReCache: Bool = false) async throws -> UIImage {
         if forceReCache || tasks[picture.id] == nil {
@@ -49,5 +54,15 @@ public actor FlowCache {
         }
         tasks[picture.id]?.cancel()
         tasks[picture.id] = newTask
+    }
+
+    // MARK: - Private functions
+    private func subscribeToMemoryWarning() {
+        let warningNotification = UIApplication.didReceiveMemoryWarningNotification
+        let warningPublisher = NotificationCenter.default.publisher(for: warningNotification)
+        memoryWarningSubscription = warningPublisher
+            .sink { notification in
+                print("FlowCache: did receive memory warning! Handler not implemented.")
+            }
     }
 }
