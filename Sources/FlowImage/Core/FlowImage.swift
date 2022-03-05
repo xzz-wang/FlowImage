@@ -1,8 +1,10 @@
 import UIKit
 
+/**
+ A type that represents information on how to produce an image.
+ */
 public protocol FlowImage {
 
-    // swiftlint:disable type_name
     typealias ID = String
     var id: ID { get }
 
@@ -21,6 +23,7 @@ public protocol FlowImage {
 }
 
 public extension FlowImage {
+    /// Get a type-erasing instance that conforms to Equatable, Hashable, and Identifiable.
     func eraseToAnyFlowImage() -> AnyFlowImage {
         return AnyFlowImage(self)
     }

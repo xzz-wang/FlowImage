@@ -8,14 +8,7 @@
 import SwiftUI
 
 public struct FlowImageView<Content: View>: View {
-    /// The three states of this view.
-    public enum ViewState {
-        case displaying
-        case error
-        case loading
-    }
-
-    public init(image: FlowImage?, cache: FlowCache? = nil, contentBuilder: @escaping (UIImage?, ViewState) -> Content) {
+    public init(image: FlowImage?, cache: FlowCache? = nil, contentBuilder: @escaping (UIImage?, FlowImageViewState) -> Content) {
         self.image = image
         self.cache = cache ?? FlowCache.shared
         self.contentBuilder = contentBuilder
@@ -24,11 +17,11 @@ public struct FlowImageView<Content: View>: View {
     // MARK: - Inputs
     let image: FlowImage?
     let cache: FlowCache
-    @ViewBuilder let contentBuilder: (UIImage?, ViewState) -> Content
+    @ViewBuilder let contentBuilder: (UIImage?, FlowImageViewState) -> Content
 
     // MARK: - States
     @State private var uiimage: UIImage?
-    @State private var viewState: ViewState = .loading
+    @State private var viewState: FlowImageViewState = .loading
 
     // MARK: - View Body
     public var body: some View {
@@ -53,3 +46,10 @@ public struct FlowImageView<Content: View>: View {
         }
     }
 }
+
+public enum FlowImageViewState {
+    case displaying
+    case error
+    case loading
+}
+

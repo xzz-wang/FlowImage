@@ -5,47 +5,81 @@
 //  Created by Xuezheng Wang on 2/5/22.
 //
 
+import Combine
 import Foundation
 import UIKit
 
 ///
-/// Used in Picture's getUIImageFromCache() to produce your image.
+/// An actor that produces thread-safe caching of FlowImages.
 ///
-public actor FlowCache {
+@MainActor
+public class FlowCache {
+    /// A singleton instance that is commonly used as default when a FlowCache is needed.
     public static let shared = FlowCache()
 
     /// Maybe in the future we can add an expire time to this.
     private struct CacheEntry {
-        let image: FlowImage
+        let image: Task<FlowImage, Error>
+        let didChangePublisher: PassthroughSubject<Void, Never>
     }
 
-    private var tasks: [FlowImage.ID: Task<CacheEntry, Error>] = [:]
+    private var imageCache: [FlowImage.ID: CacheEntry] = [:]
+    private var memoryWarningSubscription: Cancellable?
 
-    public init() {}
-
-    /// Cache the image or replace the cached image.
-    func cache(_ picture: FlowImage) {
-        let newTask = Task { () -> CacheEntry in
-            do {
-                let preparedPic = try await picture.prepareForDisplay()
-                return CacheEntry(image: preparedPic)
-            } catch {
-                tasks[picture.id] = nil
-                throw error
-            }
-        }
-        tasks[picture.id]?.cancel()
-        tasks[picture.id] = newTask
+    public init() {
+        subscribeToMemoryWarning()
     }
 
     public func get(_ picture: FlowImage, forceReCache: Bool = false) async throws -> UIImage {
-        if forceReCache || tasks[picture.id] == nil {
+        if forceReCache || imageCache[picture.id] == nil {
             cache(picture)
         }
-        return try await tasks[picture.id]!.value.image.getUIImage()
+        return try await imageCache[picture.id]!.image.value.getUIImage()
     }
 
-    public func reset() {
-        tasks = [:]
+    public func clear() {
+        for (_, cacheEntry) in imageCache {
+            cacheEntry.image.cancel()
+        }
+        imageCache = [:]
+    }
+
+    /// Cache the image or replace the cached image.
+    func cache(_ picture: FlowImage) {
+        // Create a new task to cache this new image
+        let newImgTask = Task { () -> FlowImage in
+            do {
+                return try await picture.prepareForDisplay()
+            } catch {
+                imageCache[picture.id] = nil
+                throw error
+            }
+        }
+
+        let entry = imageCache[picture.id]
+
+        // Cancel the image task if there's already an entry
+        entry?.image.cancel()
+
+        // Create new publisher if needed, then build new entry
+        let publisher = entry?.didChangePublisher ?? PassthroughSubject<Void, Never>()
+        let newEntry = CacheEntry(image: newImgTask, didChangePublisher: publisher)
+
+        // Replace existing entry, then notify changes if needed.
+        imageCache[picture.id] = newEntry
+        entry?.didChangePublisher.send() // Notify changes if there
+    }
+
+    // MARK: - Private functions
+
+    /// Subscribe to publisher for handling low memory
+    /// Note: Currently, the cache will clear itself when the memory is low.
+    private func subscribeToMemoryWarning() {
+        let warningNotification = UIApplication.didReceiveMemoryWarningNotification
+        let warningPublisher = NotificationCenter.default.publisher(for: warningNotification)
+        memoryWarningSubscription = warningPublisher
+            .sink { notification in
+                self.clear()
+            }
     }
 }
