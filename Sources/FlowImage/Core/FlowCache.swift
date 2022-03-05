@@ -38,10 +38,14 @@ public class FlowCache {
     }
 
     public func clear() {
+        var publishers: [PassthroughSubject<Void, Never>] = []
         for (_, cacheEntry) in imageCache {
             cacheEntry.image.cancel()
+            publishers.append(cacheEntry.didChangePublisher)
         }
         imageCache = [:]
+
+        publishers.forEach { $0.send() }
     }
 
     /// Cache the image or replace the cached image.
