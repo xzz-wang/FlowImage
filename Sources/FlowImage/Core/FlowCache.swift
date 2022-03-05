@@ -19,10 +19,10 @@ public class FlowCache {
 
     /// Maybe in the future we can add an expire time to this.
     private struct CacheEntry {
-        let image: FlowImage
+        let image: Task<FlowImage, Error>
     }
 
-    private var tasks: [FlowImage.ID: Task<CacheEntry, Error>] = [:]
+    private var imageCache: [FlowImage.ID: CacheEntry] = [:]
     private var memoryWarningSubscription: Cancellable?
 
     public init() {
@@ -30,32 +30,31 @@ public class FlowCache {
     }
 
     public func get(_ picture: FlowImage, forceReCache: Bool = false) async throws -> UIImage {
-        if forceReCache || tasks[picture.id] == nil {
+        if forceReCache || imageCache[picture.id] == nil {
             cache(picture)
         }
-        return try await tasks[picture.id]!.value.image.getUIImage()
+        return try await imageCache[picture.id]!.image.value.getUIImage()
     }
 
     public func clear() {
-        for (_, task) in tasks {
-            task.cancel()
+        for (_, cacheEntry) in imageCache {
+            cacheEntry.image.cancel()
         }
-        tasks = [:]
+        imageCache = [:]
     }
 
     /// Cache the image or replace the cached image.
     func cache(_ picture: FlowImage) {
-        let newTask = Task { () -> CacheEntry in
+        let newImgTask = Task { () -> FlowImage in
             do {
-                let preparedPic = try await picture.prepareForDisplay()
-                return CacheEntry(image: preparedPic)
+                return try await picture.prepareForDisplay()
             } catch {
-                tasks[picture.id] = nil
+                imageCache[picture.id] = nil
                 throw error
             }
         }
-        tasks[picture.id]?.cancel()
-        tasks[picture.id] = newTask
+        imageCache[picture.id]?.image.cancel()
+        imageCache[picture.id] = CacheEntry(image: newImgTask)
     }
 
     // MARK: - Private functions
