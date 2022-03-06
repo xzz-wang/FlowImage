@@ -52,29 +52,28 @@ class FlowCacheTest: XCTestCase {
     }
 
     /// Test we can call reset with noting in it.
-    func testResetEmpty() throws {
-        let exp = expectation(description: "reset() doesn't crash")
-        Task {
-            cache.clear()
-            exp.fulfill()
-        }
-
-        wait(for: [exp], timeout: 1.0)
+    func testClearEmpty() throws {
+        cache.clear()
     }
 
     /// Test that we can call reset with one image.
-    func testResetOnePic() async throws {
+    func testClearOnePic() async throws {
         cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_one_pic")
-        let flow2 = TestFlowImage(img2, id: "test_one_pic")
+        let flow1Fail = TestFlowImage(img1, id: "test_one_pic", failGet: true)
 
-        _ = try await flow1.getUIImageFromCache(cache)
-        cache.clear()
-        let resultImg = try await flow2.getUIImageFromCache(cache)
+        _ = try await flow1.getUIImageFromCache(cache) // Add flow1 to cache
+        cache.clear() // Clear flow1 out of cache
 
-        XCTAssert(resultImg == img2, "Reset working incorrectly")
+        do {
+            _ = try await flow1Fail.getUIImageFromCache(cache)
+            XCTFail("We should throw error")
+        } catch {
+            XCTAssert(error as! FlowImageError == .failed)
+        }
     }
 
+    /// Make sure we can get the cached image with the same id.
     func testGet() async throws {
         cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_get")
@@ -87,6 +86,7 @@ class FlowCacheTest: XCTestCase {
         XCTAssert(resultImg == img1, "Not getting the image from cache!")
     }
 
+    /// Make sure we can get the cached image with the same id.
     func testGet2() async throws {
         cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_get")
@@ -101,6 +101,7 @@ class FlowCacheTest: XCTestCase {
         XCTAssert(resultImg == img1, "Not getting the image from cache!")
     }
 
+    /// forceRecache is doing what it's suppose to be.
     func testRecache() async throws {
         cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_recache")
@@ -119,7 +120,7 @@ class FlowCacheTest: XCTestCase {
             _ = try await flow1.getUIImageFromCache(cache)
             XCTFail()
         } catch {
-            XCTAssert(error as! FlowImageError == FlowImageError.failed)
+            XCTAssert(error as! FlowImageError == .failed)
         }
     }
 
@@ -130,7 +131,36 @@ class FlowCacheTest: XCTestCase {
             _ = try await flow1.getUIImageFromCache(cache)
             XCTFail()
         } catch {
-            XCTAssert(error as! FlowImageError == FlowImageError.failed)
+            XCTAssert(error as! FlowImageError == .failed)
         }
+    }
+
+    func testFailedPrepareAndRetryOnNextGet() async throws {
+        cache.clear()
+
+        let flow1 = TestFlowImage(img1, id: "pic", failPrepare: true)
+        let flow1Success = TestFlowImage(img1, id: "pic")
+
+        // First, faile the request once.
+        do {
+            _ = try await flow1.getUIImageFromCache(cache)
+            XCTFail()
+        } catch {
+            XCTAssert(error as! FlowImageError == .failed)
+        }
+
+        // Second request
+        do {
+            _ = try await flow1Success.getUIImageFromCache(cache)
+        } catch {
+            XCTFail("The second try shouldn't throw error")
+        }
+    }
+
+    // MARK: - Combine subscriber tests
+    func testObserveChange() async throws {
+        cache.clear()
+        let flow1 = TestFlowImage(img1)
+
     }
 }

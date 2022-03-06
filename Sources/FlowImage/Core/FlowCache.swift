@@ -20,33 +20,53 @@ public class FlowCache {
     // MARK: - Cache Entry Class definition
     /// Maybe in the future we can add an expire time to this.
     private class CacheEntry {
-        var image: Task<FlowImage, Error> {
-            willSet {
-                image.cancel()
+        var image: FlowImage {
+            didSet {
+                imageResult.cancel()
+                setImageTask(image)
             }
+        }
+
+        private(set) var imageResult: Task<FlowImage, Error>! {
             didSet {
                 subject.send()
             }
         }
 
+        var failed: Bool = false
         let didChangePublisher: Publisher // A shared wrap to the subject.
         private let subject: PassthroughSubject<Publisher.Output, Publisher.Failure>
 
-        init(imageTask: Task<FlowImage, Error>) {
-            self.image = imageTask
+
+        init(image: FlowImage) {
+            self.image = image
 
             self.subject = PassthroughSubject<Publisher.Output, Publisher.Failure>()
             self.didChangePublisher = subject
                 .share()
                 .eraseToAnyPublisher()
+
+            setImageTask(self.image)
         }
 
         func getUIImage() async throws -> UIImage {
-            return try await image.value.getUIImage()
+            return try await imageResult.value.getUIImage()
+        }
+
+        private func setImageTask(_ image: FlowImage) {
+            failed = false
+            imageResult = Task {
+                do {
+                    return try await image.prepareForDisplay()
+                } catch {
+                    failed = true
+                    throw error
+                }
+            }
         }
 
         deinit {
-            image.cancel()
+            imageResult.cancel()
             subject.send(completion: .finished)
         }
     }
@@ -64,7 +84,8 @@ public class FlowCache {
     }
 
     public func get(_ picture: FlowImage, forceReCache: Bool = false) async throws -> UIImage {
-        if forceReCache || imageCache[picture.id] == nil {
+        let entry = imageCache[picture.id]
+        if forceReCache || entry == nil || entry!.failed {
             cache(picture)
         }
         return try await imageCache[picture.id]!.getUIImage()
@@ -86,15 +107,10 @@ public class FlowCache {
 
     /// Cache the image or replace the cached image.
     func cache(_ picture: FlowImage) {
-        // Create a new task to cache this new image
-        let newImgTask = Task { () -> FlowImage in
-            return try await picture.prepareForDisplay()
-        }
-
         if let entry = imageCache[picture.id] {
-            entry.image = newImgTask
+            entry.image = picture
         } else {
-            imageCache[picture.id] = CacheEntry(imageTask: newImgTask)
+            imageCache[picture.id] = CacheEntry(image: picture)
         }
     }
 
