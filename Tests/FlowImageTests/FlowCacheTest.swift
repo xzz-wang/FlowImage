@@ -192,6 +192,33 @@ class FlowCacheTest: XCTestCase {
         canceler.cancel()
     }
 
+    func testMultipleSubscriber() async throws {
+        cache.clear()
+        let flow1 = TestFlowImage(img1, id: "pic")
+        let exp1 = expectation(description: "First subscriber should be notified")
+        let exp2 = expectation(description: "Second subscriber should be notified")
+
+        // Get the first publisher
+        let (_, publisher1) = try await cache.getAndSubscribeTo(flow1)
+        let canceler = publisher1
+            .sink { _ in
+                exp1.fulfill()
+            } receiveValue: {}
+
+        // Get the second publisher
+        let (_, publisher2) = try await cache.getAndSubscribeTo(flow1)
+        let canceler2 = publisher2
+            .sink { _ in
+                exp2.fulfill()
+            } receiveValue: {}
+
+        cache.clear()
+        wait(for: [exp1, exp2], timeout: 0.5)
+        canceler.cancel()
+        canceler2.cancel()
+    }
+
+
     func testMemoryConstraint() async throws {
         cache.clear()
         let flow1 = TestFlowImage(img1, id: "pic")

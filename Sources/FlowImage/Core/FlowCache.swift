@@ -18,7 +18,7 @@ public class FlowCache {
     public typealias Publisher = AnyPublisher<Void, Never>
 
     // MARK: - Cache Entry Class definition
-    /// Maybe in the future we can add an expire time to this.
+    /// An object that manages the caching of each FlowImage.
     private class CacheEntry {
         var image: FlowImage {
             didSet {
@@ -83,6 +83,12 @@ public class FlowCache {
         subscribeToMemoryWarning()
     }
 
+    /// Get this FlowImage's as UIImage.
+    ///
+    /// This will trigger caching if
+    ///  1. This is the first time we call `get()` with this FlowImage's id.
+    ///  2. `forceReCache` is set to `true`.
+    ///  3. The last `get()` with this id failed.
     public func get(
         _ picture: FlowImage,
         forceReCache: Bool = false
@@ -94,6 +100,12 @@ public class FlowCache {
         return try await imageCache[picture.id]!.getUIImage()
     }
 
+    /// Does the same thing as `get()`, while also returns a publisher to notify you of the changes.
+    ///
+    /// - Returns:
+    /// Publisher: This publisher will emit
+    /// whenever someone else forced a recache. It will send completion when this image is
+    /// removed from the cache (due to memory constraint).
     public func getAndSubscribeTo(
         _ picture: FlowImage,
         forceReCache: Bool = false
@@ -105,6 +117,7 @@ public class FlowCache {
         return (image, publisher)
     }
 
+    /// Remove all the cached image from the cache.
     public func clear() {
         imageCache = [:]
     }
