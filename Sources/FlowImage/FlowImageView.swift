@@ -5,6 +5,7 @@
 //  Created by Xuezheng Wang on 1/26/22.
 //
 
+import Combine
 import SwiftUI
 
 public struct FlowImageView<Content: View>: View {
@@ -22,6 +23,7 @@ public struct FlowImageView<Content: View>: View {
     // MARK: - States
     @State private var uiimage: UIImage?
     @State private var viewState: FlowImageViewState = .loading
+    @State private var canceler: Cancellable?
 
     // MARK: - View Body
     public var body: some View {
@@ -36,9 +38,22 @@ public struct FlowImageView<Content: View>: View {
 
     private func fetchImage(_ image: FlowImage?, cache: FlowCache) {
         viewState = .loading
+        self.canceler?.cancel()
         Task {
             do {
-                self.uiimage = try await image?.getUIImageFromCache(cache)
+                if let image = image {
+                    let (uiimage, publisher) = try await cache.getAndSubscribeTo(image)
+                    self.uiimage = uiimage
+
+                    // Subscribe to
+                    self.canceler = publisher.sink { _ in
+                        fetchImage(self.image, cache: cache)
+                    } receiveValue: { _ in
+                        fetchImage(self.image, cache: cache)
+                    }
+                } else {
+                    self.uiimage = nil
+                }
                 viewState = .displaying
             } catch {
                 viewState = .error

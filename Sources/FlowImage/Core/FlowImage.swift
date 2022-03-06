@@ -28,11 +28,8 @@ public extension FlowImage {
         return AnyFlowImage(self)
     }
 
-    func getUIImageFromCache(forceRecache: Bool = false) async throws -> UIImage {
-        try await self.getUIImageFromCache(FlowCache.shared, forceRecache: forceRecache)
-    }
-
-    func getUIImageFromCache(_ cache: FlowCache, forceRecache: Bool = false) async throws -> UIImage {
-        try await cache.get(self, forceReCache: forceRecache)
+    func getUIImageFromCache(_ c: FlowCache? = nil, forceRecache: Bool = false) async throws -> UIImage {
+        let cache = c ?? FlowCache.shared
+        return try await cache.get(self, forceReCache: forceRecache)
     }
 }
