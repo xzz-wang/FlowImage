@@ -83,7 +83,10 @@ public class FlowCache {
         subscribeToMemoryWarning()
     }
 
-    public func get(_ picture: FlowImage, forceReCache: Bool = false) async throws -> UIImage {
+    public func get(
+        _ picture: FlowImage,
+        forceReCache: Bool = false
+    ) async throws -> UIImage {
         let entry = imageCache[picture.id]
         if forceReCache || entry == nil || entry!.failed {
             cache(picture)
@@ -91,7 +94,10 @@ public class FlowCache {
         return try await imageCache[picture.id]!.getUIImage()
     }
 
-    public func getAndSubscribeTo(_ picture: FlowImage, forceReCache: Bool = false) async throws -> (UIImage, Publisher) {
+    public func getAndSubscribeTo(
+        _ picture: FlowImage,
+        forceReCache: Bool = false
+    ) async throws -> (UIImage, Publisher) {
         let image = try await get(picture, forceReCache: forceReCache)
         guard let publisher = imageCache[picture.id]?.didChangePublisher else {
             throw FlowImageError.unexpected

@@ -160,7 +160,54 @@ class FlowCacheTest: XCTestCase {
     // MARK: - Combine subscriber tests
     func testObserveChange() async throws {
         cache.clear()
-        let flow1 = TestFlowImage(img1)
+        let flow1 = TestFlowImage(img1, id: "pic")
+        let exp = expectation(description: "We should be notified when the value chagnes.")
 
+        // Get the publisher
+        let (_, publisher) = try await cache.getAndSubscribeTo(flow1)
+        let canceler = publisher
+            .sink {
+                exp.fulfill()
+            }
+
+        _ = try await flow1.getUIImageFromCache(cache, forceRecache: true)
+        wait(for: [exp], timeout: 0.5)
+        canceler.cancel()
     }
+
+    func testObserveCompletion() async throws {
+        cache.clear()
+        let flow1 = TestFlowImage(img1, id: "pic")
+        let exp = expectation(description: "We should be notified when the subscriber is deleted.")
+
+        // Get the publisher
+        let (_, publisher) = try await cache.getAndSubscribeTo(flow1)
+        let canceler = publisher
+            .sink { _ in
+                exp.fulfill()
+            } receiveValue: {}
+
+        cache.clear()
+        wait(for: [exp], timeout: 0.5)
+        canceler.cancel()
+    }
+
+    func testMemoryConstraint() async throws {
+        cache.clear()
+        let flow1 = TestFlowImage(img1, id: "pic")
+        let exp = expectation(description: "We should be notified when we have memory constraint..")
+
+        // Get the publisher
+        let (_, publisher) = try await cache.getAndSubscribeTo(flow1)
+        let canceler = publisher
+            .sink { _ in
+                exp.fulfill()
+            } receiveValue: {}
+
+        let notification = Notification(name: UIApplication.didReceiveMemoryWarningNotification)
+        NotificationCenter.default.post(notification)
+        wait(for: [exp], timeout: 0.5)
+        canceler.cancel()
+    }
+
 }
