@@ -51,6 +51,7 @@ class FlowCacheTest: XCTestCase {
         }
     }
 
+    /// Test we can call reset with noting in it.
     func testResetEmpty() throws {
         let exp = expectation(description: "reset() doesn't crash")
         Task {
@@ -61,6 +62,7 @@ class FlowCacheTest: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
 
+    /// Test that we can call reset with one image.
     func testResetOnePic() async throws {
         cache.clear()
         let flow1 = TestFlowImage(img1, id: "test_one_pic")

@@ -10,5 +10,6 @@ import Foundation
 public enum FlowImageError: Error {
     case uiImageDecodeFailed
     case dataToImageConvertionFailed
+    case unexpected
     case failed
 }

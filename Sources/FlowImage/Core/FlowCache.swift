@@ -14,18 +14,51 @@ import UIKit
 ///
 @MainActor
 public class FlowCache {
+    /// Combine publisher types
+    public typealias Publisher = AnyPublisher<Void, Never>
+
+    // MARK: - Cache Entry Class definition
+    /// Maybe in the future we can add an expire time to this.
+    private class CacheEntry {
+        var image: Task<FlowImage, Error> {
+            willSet {
+                image.cancel()
+            }
+            didSet {
+                subject.send()
+            }
+        }
+
+        let didChangePublisher: Publisher // A shared wrap to the subject.
+        private let subject: PassthroughSubject<Publisher.Output, Publisher.Failure>
+
+        init(imageTask: Task<FlowImage, Error>) {
+            self.image = imageTask
+
+            self.subject = PassthroughSubject<Publisher.Output, Publisher.Failure>()
+            self.didChangePublisher = subject
+                .share()
+                .eraseToAnyPublisher()
+        }
+
+        func getUIImage() async throws -> UIImage {
+            return try await image.value.getUIImage()
+        }
+
+        deinit {
+            image.cancel()
+            subject.send(completion: .finished)
+        }
+    }
+
+    // MARK: - FlowCache Properties
     /// A singleton instance that is commonly used as default when a FlowCache is needed.
     public static let shared = FlowCache()
-
-    /// Maybe in the future we can add an expire time to this.
-    private struct CacheEntry {
-        let image: Task<FlowImage, Error>
-        let didChangePublisher: PassthroughSubject<Void, Never>
-    }
 
     private var imageCache: [FlowImage.ID: CacheEntry] = [:]
     private var memoryWarningSubscription: Cancellable?
 
+    // MARK: - Public Methods
     public init() {
         subscribeToMemoryWarning()
     }
@@ -34,44 +67,35 @@ public class FlowCache {
         if forceReCache || imageCache[picture.id] == nil {
             cache(picture)
         }
-        return try await imageCache[picture.id]!.image.value.getUIImage()
+        return try await imageCache[picture.id]!.getUIImage()
+    }
+
+    public func getAndSubscribeTo(_ picture: FlowImage, forceReCache: Bool = false) async throws -> (UIImage, Publisher) {
+        let image = try await get(picture, forceReCache: forceReCache)
+        guard let publisher = imageCache[picture.id]?.didChangePublisher else {
+            throw FlowImageError.unexpected
+        }
+        return (image, publisher)
     }
 
     public func clear() {
-        var publishers: [PassthroughSubject<Void, Never>] = []
-        for (_, cacheEntry) in imageCache {
-            cacheEntry.image.cancel()
-            publishers.append(cacheEntry.didChangePublisher)
-        }
         imageCache = [:]
-
-        publishers.forEach { $0.send() }
     }
+
+    // MARK: - Internal Methods
 
     /// Cache the image or replace the cached image.
     func cache(_ picture: FlowImage) {
         // Create a new task to cache this new image
         let newImgTask = Task { () -> FlowImage in
-            do {
-                return try await picture.prepareForDisplay()
-            } catch {
-                imageCache[picture.id] = nil
-                throw error
-            }
+            return try await picture.prepareForDisplay()
         }
 
-        let entry = imageCache[picture.id]
-
-        // Cancel the image task if there's already an entry
-        entry?.image.cancel()
-
-        // Create new publisher if needed, then build new entry
-        let publisher = entry?.didChangePublisher ?? PassthroughSubject<Void, Never>()
-        let newEntry = CacheEntry(image: newImgTask, didChangePublisher: publisher)
-
-        // Replace existing entry, then notify changes if needed.
-        imageCache[picture.id] = newEntry
-        entry?.didChangePublisher.send() // Notify changes if there
+        if let entry = imageCache[picture.id] {
+            entry.image = newImgTask
+        } else {
+            imageCache[picture.id] = CacheEntry(imageTask: newImgTask)
+        }
     }
 
     // MARK: - Private functions
