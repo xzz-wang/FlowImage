@@ -9,27 +9,39 @@ import FlowImage
 import SwiftUI
 
 struct Level2View: View {
-    @State var image: FlowImage = sampleImages[0]
+    @State var image: FlowImage? = nil
     
     var body: some View {
         VStack {
             SampleImageView(image: image)
-                .frame(height: 400)
+                .frame(height: 300)
 
-            ForEach(sampleImages.indices, id: \.self) { idx in
-                let sampleImage = sampleImages[idx]
-                Button {
-                    image = sampleImage
-                } label: {
-                    Text("Image #\(idx)")
+            List {
+                Section("Tap to change the image") {
+                    changeButton(imgName: "URLFlowImage1", sampleURLFlowImage1)
+                    changeButton(imgName: "URLFlowImage2", sampleURLFlowImage2)
+                    changeButton(imgName: "Normal DownloadedFlowImage", sampleDownloadedFLowImage)
+                    changeButton(imgName: "Async wait for 5 seconds", sampleWaitGetImage)
+                    changeButton(imgName: "Fail right away", sampleFailGetImage)
+                    changeButton(imgName: "Wait then fail", sampleWaitAndFailGetImage)
+                    changeButton(imgName: "No Image", nil)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    func changeButton(imgName: String, _ flowImage: FlowImage?) -> some View {
+        Button {
+            image = flowImage
+        } label: {
+            Text(imgName)
         }
     }
 }
 
 struct SampleImageView: View {
-    let image: FlowImage
+    let image: FlowImage?
 
     var body: some View {
         FlowImageView(image: image) { image, state in
@@ -58,7 +70,7 @@ struct SampleImageView: View {
                         Image(uiImage: image)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .colorMultiply(.init(red: 0.7, green: 0.7, blue: 0.7))
+                            .colorMultiply(.init(red: 0.5, green: 0.5, blue: 0.5))
 
                     }
 

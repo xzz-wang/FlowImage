@@ -9,17 +9,6 @@ import FlowImage
 import Foundation
 import UIKit
 
-var sampleImages: [FlowImage] {
-    var images: [FlowImage] = []
-    images.append(sampleURLFlowImage1)
-    images.append(sampleURLFlowImage2)
-    images.append(sampleDownloadedFLowImage)
-    images.append(sampleWaitGetImage)
-    images.append(sampleFailGetImage)
-
-    return images
-}
-
 // MARK: Sample URLFlowImage
 let sampleURLFlowImage1 = URLFlowImage(
     URL(string: "https://i.guim.co.uk/img/media/b563ac5db4b4a4e1197c586bbca3edebca9173cd/0_12_3307_1985/master/3307.jpg?width=1200&height=900&quality=85&auto=format&fit=crop&s=61a26bf43da26e4ca97e932e5ee113f7")!
@@ -40,3 +29,7 @@ let sampleWaitGetImage = TestFlowImage(sampleUIImage1, delayGet: true, delayInSe
 
 // This one will fail when you call getUIImage()
 let sampleFailGetImage = TestFlowImage(sampleUIImage1, failGet: true)
+
+// This one will wait then fail fail when you call getUIImage()
+let sampleWaitAndFailGetImage = TestFlowImage(sampleUIImage1, failGet: true, delayGet: true)
+

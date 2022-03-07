@@ -9,7 +9,7 @@ import FlowImage
 import SwiftUI
 
 struct Level1View: View {
-    let flowImage: FlowImage = sampleImages[1]
+    let flowImage: FlowImage = sampleURLFlowImage2
     @State private var image: UIImage? = nil
 
     var body: some View {

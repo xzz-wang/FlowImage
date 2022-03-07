@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var image = sampleImages[0]
     var body: some View {
         NavigationView {
             List {
