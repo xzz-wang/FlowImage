@@ -1,6 +1,6 @@
 //
-//  ProfilePicture.swift
-//  ClassHouse
+//  FlowImageView.swift
+//  
 //
 //  Created by Xuezheng Wang on 1/26/22.
 //
@@ -62,10 +62,3 @@ public struct FlowImageView<Content: View>: View {
         }
     }
 }
-
-public enum FlowImageViewState {
-    case displaying
-    case error
-    case loading
-}
-
