@@ -44,10 +44,10 @@ struct SampleImageView: View {
     let image: FlowImage?
 
     var body: some View {
-        FlowImageView(image: image) { image, state in
+        FlowImageView(image: image) { uiimage, state in
             ZStack {
                 if state == .displaying {
-                    if let image = image {
+                    if let image = uiimage {
                         // Being in here means we have a proper image to display
                         Image(uiImage: image)
                             .resizable()
@@ -64,7 +64,7 @@ struct SampleImageView: View {
                     Text("There was an error!")
 
                 } else if state == .loading {
-                    if let image = image {
+                    if let image = uiimage {
                         // If image is not nil when loading, it will be the image
                         // before we started loading.
                         Image(uiImage: image)
