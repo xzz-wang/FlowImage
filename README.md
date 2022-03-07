@@ -17,7 +17,7 @@ image = try? await yourURLFlowImage.getUIImage() // You can execute this in your
 It's annoying to handle the state of loading your image and display it correctly. Introducing FlowImageView. It has the following
 features:
 - **Automatic caching**: if you are using this image multiple times, `prepareForDisplay()` of that FlowImage will only be called once! If you are using `URLFlowImage`, it means that we will only download the image once. 
-- **Automatic state management**: In the body of `FlowImageView`, we give you a value of type `FlowImageViewState`([link](Source/FlowImage/FlowImageView/FlowImageViewState)) so that you know what's going on. 
+- **Automatic state management**: In the body of `FlowImageView`, we give you a value of type `FlowImageViewState`([link](Sources/FlowImage/FlowImageView/FlowImageViewState.swift)) so that you know what's going on. 
 
 Example [(Link to sample App)](FlowImageSampleApp/FlowImageSampleApp/Level2View.swift):
 ```Swift
