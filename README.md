@@ -1,6 +1,11 @@
 # FlowImage
 A Swift/SwiftUI utility for caching and displaying images asynchronously. Built with Swift 5.5 and works with async/await.
 
+### Features:
+- Asynchronously loading images using async/await from Swift 5.5
+- Automatic caching of images. See `FlowCache`.
+- Automatic loading/error state management. See `FlowImageView`.
+
 ### Install
 To add FlowImage to your app, see: [Doc: Adding Package Dependencies to Your App](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app)
 
@@ -65,10 +70,16 @@ FlowImageView(image: image) { uiimage, state in
 ## Level 3: Implementing your own FlowImage
 The image can be stored anywhere. In another project, the images are stored on 
 Firestore. You can create your own FlowImage class that conforms to the protocol,
-and it will be seamlessly integrated with the result of the package.
+and it will be seamlessly integrated with the result of the package. [Here](Sources/FlowImage/Core/FlowImage.swift)
+'s where `FlowImage` is defined. Refer to the later section named "Implementing FlowImage".
+
+## Level 4+: Just go read the code and learn what's going on.
+- Create an instance of `FlowCache` instead of using the shared one? Sure.
+- Create your own `FlowImageView` and interact with `FlowImage` directly while managing your own state? Sure.
+- Need a FlowImage instance that conforms to `Equatable`, `Hashable`, and/or `Identifiable`? Just use `eraseToAnyFlowImage()`.
 
 
-## Implementing an instance of FlowImage
+## Implementing FlowImage
 
 FlowImage is a protocol for you to implement. Once implemented, it will come with 
 a lot of great utilities. A `FlowImage` should store all the necessary information 
@@ -101,7 +112,3 @@ it can work independent from a cache.
 ### hash(into hasher: inout Hasher)
 This is here so that we can hash any `FlowImage` type if needed. `AnyFlowImage` conforms to `Hashable`.
 - [Swift Standard Library: Hashable](https://developer.apple.com/documentation/swift/hashable)
-
-
-## FlowCache
-Work in progress...
