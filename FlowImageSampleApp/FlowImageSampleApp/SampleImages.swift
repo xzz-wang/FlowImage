@@ -31,3 +31,10 @@ let sampleURLFlowImage2 = URLFlowImage(
 fileprivate let sampleUIImage1 = UIImage(named: "craig")!
 let sampleDownloadedFLowImage = DownloadedFlowImage(uiImage: sampleUIImage1)
 
+// MARK: Test Downloaded FlowImage
+
+// This one will wait for 5 seconds when you call getUIImage()
+let sampleWaitGetImage = TestFlowImage(sampleUIImage1, delayGet: true, delayInSeconds: 5)
+
+// This one will fail when you call getUIImage()
+let sampleFailGetImage = TestFlowImage(sampleUIImage1, failGet: true)

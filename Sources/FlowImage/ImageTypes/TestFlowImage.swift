@@ -39,7 +39,7 @@ public class TestFlowImage: FlowImage {
         delayInSeconds: Double = 2
     ) {
         self.img = uiimage
-        self.id = id ?? "TestImage - \(img.hashValue)"
+        self.id = id ?? "TestImage - \(UUID().uuidString)"
         self.failPrepare = failPrepare
         self.failGet = failGet
         self.delayGet = delayGet

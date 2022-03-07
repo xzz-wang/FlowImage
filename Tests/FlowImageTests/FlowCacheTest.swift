@@ -35,7 +35,7 @@ class FlowCacheTest: XCTestCase {
             _ = try await flow1Fail.getUIImageFromCache(cache)
             XCTFail("We should throw error")
         } catch {
-            XCTAssert(error as! FlowImageError == .failed)
+            XCTAssert(error as! FlowImageError == .failedForTest)
         }
     }
 
@@ -86,7 +86,7 @@ class FlowCacheTest: XCTestCase {
             _ = try await flow1.getUIImageFromCache(cache)
             XCTFail()
         } catch {
-            XCTAssert(error as! FlowImageError == .failed)
+            XCTAssert(error as! FlowImageError == .failedForTest)
         }
     }
 
@@ -97,7 +97,7 @@ class FlowCacheTest: XCTestCase {
             _ = try await flow1.getUIImageFromCache(cache)
             XCTFail()
         } catch {
-            XCTAssert(error as! FlowImageError == .failed)
+            XCTAssert(error as! FlowImageError == .failedForTest)
         }
     }
 
@@ -112,7 +112,7 @@ class FlowCacheTest: XCTestCase {
             _ = try await flow1.getUIImageFromCache(cache)
             XCTFail()
         } catch {
-            XCTAssert(error as! FlowImageError == .failed)
+            XCTAssert(error as! FlowImageError == .failedForTest)
         }
 
         // Second request
