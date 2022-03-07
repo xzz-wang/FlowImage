@@ -56,6 +56,7 @@ public struct FlowImageView<Content: View>: View {
                 }
                 viewState = .displaying
             } catch {
+                uiimage = nil
                 viewState = .error
             }
         }

@@ -14,6 +14,8 @@ var sampleImages: [FlowImage] {
     images.append(sampleURLFlowImage1)
     images.append(sampleURLFlowImage2)
     images.append(sampleDownloadedFLowImage)
+    images.append(sampleWaitGetImage)
+    images.append(sampleFailGetImage)
 
     return images
 }
