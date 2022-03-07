@@ -17,40 +17,6 @@ class FlowCacheTest: XCTestCase {
     private let img2 = UIImage(systemName: "person.2")!
     private let img3 = UIImage(systemName: "person.3")!
 
-    private class TestFlowImage: FlowImage {
-        var id: ID
-
-        private let img: UIImage
-        private let failPrepare: Bool
-        private let failGet: Bool
-
-
-        init(_ uiimage: UIImage, id: ID? = nil, failPrepare: Bool = false, failGet: Bool = false) {
-            self.img = uiimage
-            self.id = id ?? "TestImage - \(img.hashValue)"
-            self.failPrepare = failPrepare
-            self.failGet = failGet
-        }
-
-        func prepareForDisplay() async throws -> FlowImage {
-            if failPrepare {
-                throw FlowImageError.failed
-            }
-            return self
-        }
-
-        func getUIImage() async throws -> UIImage {
-            if failGet {
-                throw FlowImageError.failed
-            }
-            return img
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(img)
-        }
-    }
-
     /// Test we can call reset with noting in it.
     func testClearEmpty() throws {
         cache.clear()

@@ -11,5 +11,6 @@ public enum FlowImageError: Error {
     case uiImageDecodeFailed
     case dataToImageConvertionFailed
     case unexpected
+    case failedForTest
     case failed
 }
