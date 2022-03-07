@@ -4,7 +4,7 @@ A Swift/SwiftUI utility for caching and displaying images asynchronously. Built 
 ### Features:
 - Asynchronously loading images using async/await from Swift 5.5
 - Automatic caching of images. See `FlowCache`.
-- Automatic loading/error state management. See `FlowImageView`.
+- Automatic caching with automatic loading/error state management. See `FlowImageView`.
 
 ### Install
 To add FlowImage to your app, see: [Doc: Adding Package Dependencies to Your App](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app)
