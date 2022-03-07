@@ -2,71 +2,28 @@
 //  Level1View.swift
 //  FlowImageSampleApp
 //
-//  Created by Xuezheng Wang on 3/5/22.
+//  Created by Xuezheng Wang on 3/6/22.
 //
 
 import FlowImage
 import SwiftUI
 
 struct Level1View: View {
-    @State var image: FlowImage = sampleImages[0]
-    
-    var body: some View {
-        VStack {
-            SampleImageView(image: image)
-                .frame(height: 400)
+    let flowImage: FlowImage = sampleImages[1]
+    @State private var image: UIImage? = nil
 
-            ForEach(sampleImages.indices, id: \.self) { idx in
-                let sampleImage = sampleImages[idx]
-                Button {
-                    image = sampleImage
-                } label: {
-                    Text("Image #\(idx)")
-                }
+    var body: some View {
+        Group {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } else {
+                Text("Loading")
             }
         }
-    }
-}
-
-struct SampleImageView: View {
-    let image: FlowImage
-
-    var body: some View {
-        FlowImageView(image: image) { image, state in
-            ZStack {
-                if state == .displaying {
-                    if let image = image {
-                        // Being in here means we have a proper image to display
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-
-                    } else {
-                        // If the image is nil and we are displaying, it means the
-                        // FlowImage that's passed in is nil.
-                        Text("No Image")
-                    }
-                } else if state == .error {
-                    // If state == .error, it means an error occurred, and image
-                    // value is set to nil.
-                    Text("There was an error!")
-
-                } else if state == .loading {
-                    if let image = image {
-                        // If image is not nil when loading, it will be the image
-                        // before we started loading.
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .colorMultiply(.init(red: 0.7, green: 0.7, blue: 0.7))
-
-                    }
-
-                    // We overlay a progress view if we are loading.
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                }
-            }
+        .task {
+            image = try? await flowImage.getUIImage()
         }
     }
 }

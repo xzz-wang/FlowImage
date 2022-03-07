@@ -11,12 +11,17 @@ struct ContentView: View {
     @State var image = sampleImages[0]
     var body: some View {
         NavigationView {
-            VStack {
+            List {
                 NavigationLink("Level 1: Using URLFlowImage") {
                     Level1View()
                 }
+
+                NavigationLink("Level 2: Using URLFlowImage with FlowImageView") {
+                    Level2View()
+                }
             }
         }
+        .navigationTitle("FlowImage Sample App")
     }
 }
 
