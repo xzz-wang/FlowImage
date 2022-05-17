@@ -17,65 +17,11 @@ public class FlowCache {
     /// Combine publisher types
     public typealias Publisher = AnyPublisher<Void, Never>
 
-    // MARK: - Cache Entry Class definition
-    /// An object that manages the caching of each FlowImage.
-    private class CacheEntry {
-        var image: FlowImage {
-            didSet {
-                imageResult.cancel()
-                setImageTask(image)
-            }
-        }
-
-        private(set) var imageResult: Task<FlowImage, Error>! {
-            didSet {
-                subject.send()
-            }
-        }
-
-        var failed: Bool = false
-        let didChangePublisher: Publisher // A shared wrap to the subject.
-        private let subject: PassthroughSubject<Publisher.Output, Publisher.Failure>
-
-
-        init(image: FlowImage) {
-            self.image = image
-
-            self.subject = PassthroughSubject<Publisher.Output, Publisher.Failure>()
-            self.didChangePublisher = subject
-                .share()
-                .eraseToAnyPublisher()
-
-            setImageTask(self.image)
-        }
-
-        func getUIImage() async throws -> UIImage {
-            return try await imageResult.value.getUIImage()
-        }
-
-        private func setImageTask(_ image: FlowImage) {
-            failed = false
-            imageResult = Task {
-                do {
-                    return try await image.prepareForDisplay()
-                } catch {
-                    failed = true
-                    throw error
-                }
-            }
-        }
-
-        deinit {
-            imageResult.cancel()
-            subject.send(completion: .finished)
-        }
-    }
-
     // MARK: - FlowCache Properties
     /// A singleton instance that is commonly used as default when a FlowCache is needed.
     public static let shared = FlowCache()
 
-    private var imageCache: [FlowImage.ID: CacheEntry] = [:]
+    private var imageCache: [FlowImage.ID: FlowCacheEntry] = [:]
     private var memoryWarningSubscription: Cancellable?
 
     // MARK: - Public Methods
@@ -117,6 +63,10 @@ public class FlowCache {
         return (image, publisher)
     }
 
+    public func remove(_ flowImage: FlowImage) {
+        imageCache.removeValue(forKey: flowImage.id)
+    }
+
     /// Remove all the cached image from the cache.
     public func clear() {
         imageCache = [:]
@@ -129,7 +79,7 @@ public class FlowCache {
         if let entry = imageCache[picture.id] {
             entry.image = picture
         } else {
-            imageCache[picture.id] = CacheEntry(image: picture)
+            imageCache[picture.id] = FlowCacheEntry(image: picture)
         }
     }
 
@@ -144,5 +94,59 @@ public class FlowCache {
             .sink { notification in
                 self.clear()
             }
+    }
+}
+
+// MARK: - Cache Entry Class definition
+/// An object that manages the caching of each FlowImage.
+private class FlowCacheEntry {
+    var image: FlowImage {
+        didSet {
+            imageResult.cancel()
+            setImageTask(image)
+        }
+    }
+
+    private(set) var imageResult: Task<FlowImage, Error>! {
+        didSet {
+            subject.send()
+        }
+    }
+
+    var failed: Bool = false
+    let didChangePublisher: Publisher // A shared wrap to the subject.
+    private let subject: PassthroughSubject<Publisher.Output, Publisher.Failure>
+
+
+    init(image: FlowImage) {
+        self.image = image
+
+        self.subject = PassthroughSubject<Publisher.Output, Publisher.Failure>()
+        self.didChangePublisher = subject
+            .share()
+            .eraseToAnyPublisher()
+
+        setImageTask(self.image)
+    }
+
+    func getUIImage() async throws -> UIImage {
+        return try await imageResult.value.getUIImage()
+    }
+
+    private func setImageTask(_ image: FlowImage) {
+        failed = false
+        imageResult = Task {
+            do {
+                return try await image.prepareForDisplay()
+            } catch {
+                failed = true
+                throw error
+            }
+        }
+    }
+
+    deinit {
+        imageResult.cancel()
+        subject.send(completion: .finished)
     }
 }

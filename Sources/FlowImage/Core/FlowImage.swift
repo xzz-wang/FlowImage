@@ -32,4 +32,10 @@ public extension FlowImage {
         let cache = c ?? FlowCache.shared
         return try await cache.get(self, forceReCache: forceRecache)
     }
+
+    /// If this flow image is cached, calling this method will remove the image from cache.
+    func removeFromCache(_ c: FlowCache? = nil) {
+        let cache = c ?? FlowCache.shared
+        cache.remove(self)
+    }
 }
