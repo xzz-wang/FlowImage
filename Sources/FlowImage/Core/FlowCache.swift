@@ -114,14 +114,14 @@ private class FlowCacheEntry {
     }
 
     var failed: Bool = false
-    let didChangePublisher: Publisher // A shared wrap to the subject.
-    private let subject: PassthroughSubject<Publisher.Output, Publisher.Failure>
+    let didChangePublisher: FlowCache.Publisher // A shared wrap to the subject.
+    private let subject: PassthroughSubject<FlowCache.Publisher.Output, FlowCache.Publisher.Failure>
 
 
     init(image: FlowImage) {
         self.image = image
 
-        self.subject = PassthroughSubject<Publisher.Output, Publisher.Failure>()
+        self.subject = PassthroughSubject<FlowCache.Publisher.Output, FlowCache.Publisher.Failure>()
         self.didChangePublisher = subject
             .share()
             .eraseToAnyPublisher()

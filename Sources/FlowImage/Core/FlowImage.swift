@@ -34,8 +34,8 @@ public extension FlowImage {
     }
 
     /// If this flow image is cached, calling this method will remove the image from cache.
-    func removeFromCache(_ c: FlowCache? = nil) {
+    func removeFromCache(_ c: FlowCache? = nil) async {
         let cache = c ?? FlowCache.shared
-        cache.remove(self)
+        await cache.remove(self)
     }
 }
